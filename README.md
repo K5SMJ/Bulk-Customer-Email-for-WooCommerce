@@ -1,4 +1,4 @@
-# WooCommerce Bulk Customer Email
+# Bulk Customer Email for WooCommerce 
 
 A simple, lightweight plugin for sending email campaigns to WooCommerce
 customers and WordPress users.
