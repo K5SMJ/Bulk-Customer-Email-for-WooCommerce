@@ -4,7 +4,7 @@ A simple, lightweight plugin for sending email campaigns to WooCommerce
 customers and WordPress users.
 
 **Free software. No subscription. No license fee. No nonsense.**
-
+https://github.com/K5SMJ/Woocommerce_Bulk_Customer_Email/blob/main/email.png
 ## Requirements
 
 -   WordPress
