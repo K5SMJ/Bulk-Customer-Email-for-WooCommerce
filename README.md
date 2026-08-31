@@ -1,2 +1,2 @@
 # Bulk_Customer_Email
-send out bulk emails to customers
+Mass Email To Users lets you send HTML emails to your registered WordPress users straight from the WordPress admin.
