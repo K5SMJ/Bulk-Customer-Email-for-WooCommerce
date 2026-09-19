@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Bulk Customer Email for WooCommerce
  * Description: Send bulk emails to all WooCommerce customers with batched sending
- * Version: 1.2.4
+ * Version: 1.2.5
  * Requires Plugins: woocommerce
  * License: GPL-3.0-only
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -45,17 +45,16 @@ function pmbulk_get_brand_settings() {
     );
 }
 
-// Add admin menu
+// Add WooCommerce submenu
 add_action('admin_menu', 'pmbulk_add_menu');
 function pmbulk_add_menu() {
-    add_menu_page(
+    add_submenu_page(
+        'woocommerce',
         'Bulk Customer Email',
         'Bulk Email',
         'manage_woocommerce',
         'pmbulk-email',
-        'pmbulk_admin_page',
-        'dashicons-email-alt',
-        56
+        'pmbulk_admin_page'
     );
 }
 
@@ -84,7 +83,7 @@ function pmbulk_sanitize_batch_size($value) {
         return 1;
     }
     if ( $value > 20 ) {
-        return 50;
+        return 20;
     }
     return $value;
 }
@@ -93,7 +92,7 @@ function pmbulk_sanitize_batch_size($value) {
 function pmbulk_sanitize_batch_interval($value) {
     $value = (int) $value;
     if ( $value < 60 ) {
-        return 15;
+        return 60;
     }
     if ( $value > 1800 ) {
         return 900;
@@ -303,10 +302,10 @@ function pmbulk_admin_page() {
 
         if ( $action === 'save_rate_settings' ) {
             $new_batch_size = isset($_POST['pmbulk_batch_size'])
-                ? pmbulk_sanitize_batch_size(wp_unslash($_POST['pmbulk_batch_size']))
+                ? pmbulk_sanitize_batch_size(absint($_POST['pmbulk_batch_size']))
                 : $batch_size_setting;
             $new_batch_interval = isset($_POST['pmbulk_batch_interval'])
-                ? pmbulk_sanitize_batch_interval(wp_unslash($_POST['pmbulk_batch_interval']))
+                ? pmbulk_sanitize_batch_interval(absint($_POST['pmbulk_batch_interval']))
                 : $batch_interval_setting;
 
             update_option('pmbulk_batch_size', $new_batch_size);
@@ -378,10 +377,10 @@ function pmbulk_admin_page() {
             $subject = sanitize_text_field(wp_unslash($_POST['pmbulk_subject'] ?? ''));
             $message = wp_kses_post(wp_unslash($_POST['pmbulk_message'] ?? ''));
             $batch_size_setting = isset($_POST['pmbulk_batch_size'])
-                ? pmbulk_sanitize_batch_size(wp_unslash($_POST['pmbulk_batch_size']))
+                ? pmbulk_sanitize_batch_size(absint($_POST['pmbulk_batch_size']))
                 : $batch_size_setting;
             $batch_interval_setting = isset($_POST['pmbulk_batch_interval'])
-                ? pmbulk_sanitize_batch_interval(wp_unslash($_POST['pmbulk_batch_interval']))
+                ? pmbulk_sanitize_batch_interval(absint($_POST['pmbulk_batch_interval']))
                 : $batch_interval_setting;
 
             update_option('pmbulk_batch_size', $batch_size_setting);
@@ -741,88 +740,7 @@ function pmbulk_admin_page() {
         </form>
     </div>
     
-    <style>
-        .pm-box { 
-            background: #fff; 
-            border: 1px solid #dcdcde; 
-            border-radius: 12px; 
-            padding: 20px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
-        }
-        .pm-progress {
-            background: #f6f7f8;
-        }
-        details summary:hover { 
-            text-decoration: underline; 
-        }
-        .button-primary {
-            background: #111 !important;
-            border-color: #111 !important;
-            text-shadow: none !important;
-            box-shadow: none !important;
-        }
-        .button-primary:hover {
-            background: #333 !important;
-            border-color: #333 !important;
-        }
-        .pm-layout {
-            display: grid;
-            grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr);
-            gap: 20px;
-            align-items: start;
-        }
-        .pm-main-column,
-        .pm-side-column {
-            min-width: 0;
-        }
-        .pm-side-column {
-            position: sticky;
-            top: 48px;
-        }
-        .pm-audience-option {
-            display: block;
-            margin: 10px 0;
-        }
-        .pm-audience-option input {
-            margin-right: 8px;
-        }
-        .pm-history-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #fafafa;
-        }
-        .pm-history-item summary {
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .pm-history-item p {
-            margin: 8px 0;
-        }
-        .pm-inline-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        @media (max-width: 1200px) {
-            .pm-layout {
-                grid-template-columns: 1fr;
-            }
-            .pm-side-column {
-                position: static;
-            }
-        }
-        /* Style the editor to blend with email template */
-        #pmbulk_message_ifr {
-            border: 1px dashed #dcdcde !important;
-            border-radius: 4px;
-        }
-        .wp-editor-container {
-            border: none !important;
-        }
-    </style>
+
     <?php
 }
 
@@ -1001,9 +919,6 @@ function pmbulk_process_batch_callback() {
         update_option('pmbulk_active_campaign_log', $campaign);
     }
 
-    // Release the lock before scheduling the next independent request.
-    delete_option($lock_key);
-
     if ( empty($remaining) ) {
         // All done!
         pmbulk_stop_campaign('completed');
@@ -1040,12 +955,28 @@ function pmbulk_add_settings_page() {
     );
 }
 
-add_action('admin_enqueue_scripts', 'pmbulk_settings_assets');
-function pmbulk_settings_assets($hook) {
-    if ( $hook !== 'bulk-email_page_pmbulk-settings' ) {
-        return;
+// Enqueue admin assets only on this plugin's WooCommerce pages.
+add_action('admin_enqueue_scripts', 'pmbulk_enqueue_admin_assets');
+function pmbulk_enqueue_admin_assets($hook) {
+    if ( $hook === 'woocommerce_page_pmbulk-email' || $hook === 'woocommerce_page_pmbulk-settings' ) {
+        wp_enqueue_style(
+            'pmbulk-admin',
+            plugin_dir_url(__FILE__) . 'assets/admin.css',
+            array(),
+            '1.2.5'
+        );
+        wp_enqueue_script(
+            'pmbulk-admin',
+            plugin_dir_url(__FILE__) . 'assets/admin.js',
+            array('jquery'),
+            '1.2.5',
+            true
+        );
     }
-    wp_enqueue_media();
+
+    if ( $hook === 'woocommerce_page_pmbulk-settings' ) {
+        wp_enqueue_media();
+    }
 }
 
 function pmbulk_settings_page() {
@@ -1096,7 +1027,7 @@ function pmbulk_settings_page() {
                         <input type="hidden" name="pmbulk_logo_id" id="pmbulk_logo_id" value="<?php echo esc_attr($logo_id); ?>">
                         <button type="button" class="button" id="pmbulk_select_logo">Select Logo</button>
                         <button type="button" class="button" id="pmbulk_remove_logo" <?php echo $logo_id ? '' : 'style="display:none;"'; ?>>Remove</button>
-                        <div id="pmbulk_logo_preview" style="margin-top:10px;"><?php if ($logo_url) : ?><img src="<?php echo esc_url($logo_url); ?>" style="max-width:140px;height:auto;"><?php endif; ?></div>
+                        <div id="pmbulk_logo_preview" class="pmbulk-logo-preview-container"><?php if ($logo_url) : ?><img src="<?php echo esc_url($logo_url); ?>" alt="" class="pmbulk-logo-preview"><?php endif; ?></div>
                     </td>
                 </tr>
                 <tr>
@@ -1108,28 +1039,7 @@ function pmbulk_settings_page() {
             <p><button type="submit" name="pmbulk_save_brand_settings" class="button button-primary">Save Settings</button></p>
         </form>
     </div>
-    <script>
-    jQuery(function($){
-        let frame;
-        $('#pmbulk_select_logo').on('click', function(e){
-            e.preventDefault();
-            if (frame) { frame.open(); return; }
-            frame = wp.media({title:'Select Email Logo', button:{text:'Use Logo'}, multiple:false, library:{type:'image'}});
-            frame.on('select', function(){
-                const attachment = frame.state().get('selection').first().toJSON();
-                $('#pmbulk_logo_id').val(attachment.id);
-                $('#pmbulk_logo_preview').html('<img src="'+attachment.url+'" style="max-width:140px;height:auto;">');
-                $('#pmbulk_remove_logo').show();
-            });
-            frame.open();
-        });
-        $('#pmbulk_remove_logo').on('click', function(){
-            $('#pmbulk_logo_id').val('0');
-            $('#pmbulk_logo_preview').empty();
-            $(this).hide();
-        });
-    });
-    </script>
+
     <?php
 }
 
