@@ -1,0 +1,89 @@
+.pmbulk-logo-preview {
+    max-width: 140px;
+    height: auto;
+}
+
+.pmbulk-logo-preview-container {
+    margin-top: 10px;
+}
+
+.pm-box { 
+            background: #fff; 
+            border: 1px solid #dcdcde; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+        }
+        .pm-progress {
+            background: #f6f7f8;
+        }
+        details summary:hover { 
+            text-decoration: underline; 
+        }
+        .button-primary {
+            background: #111 !important;
+            border-color: #111 !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
+        .button-primary:hover {
+            background: #333 !important;
+            border-color: #333 !important;
+        }
+        .pm-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+        .pm-main-column,
+        .pm-side-column {
+            min-width: 0;
+        }
+        .pm-side-column {
+            position: sticky;
+            top: 48px;
+        }
+        .pm-audience-option {
+            display: block;
+            margin: 10px 0;
+        }
+        .pm-audience-option input {
+            margin-right: 8px;
+        }
+        .pm-history-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+        .pm-history-item summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .pm-history-item p {
+            margin: 8px 0;
+        }
+        .pm-inline-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        @media (max-width: 1200px) {
+            .pm-layout {
+                grid-template-columns: 1fr;
+            }
+            .pm-side-column {
+                position: static;
+            }
+        }
+        /* Style the editor to blend with email template */
+        #pmbulk_message_ifr {
+            border: 1px dashed #dcdcde !important;
+            border-radius: 4px;
+        }
+        .wp-editor-container {
+            border: none !important;
+        }
