@@ -1,4 +1,4 @@
-# Bulk Customer Email for WooCommerce
+# PocketMidi Bulk Email for WooCommerce
 
 A simple, lightweight plugin for sending email campaigns to WooCommerce customers and WordPress users.
 
@@ -17,7 +17,7 @@ A simple, lightweight plugin for sending email campaigns to WooCommerce customer
 ## Installation
 
 1. Upload the plugin through **Plugins → Add New → Upload Plugin**, or place it in `wp-content/plugins/`.
-2. Activate **Bulk Customer Email for WooCommerce**.
+2. Activate **PocketMidi Bulk Email for WooCommerce**.
 3. Open **WooCommerce → Bulk Email**.
 
 ## Using the Plugin
@@ -74,3 +74,8 @@ See the `LICENSE` file for the full license.
 ## Contributing
 
 Bug fixes, security improvements, compatibility fixes, and sensible improvements are welcome. Please keep the plugin simple and focused.
+
+## Links
+
+- GitHub: https://github.com/PocketMidi/Bulk-Customer-Email-for-WooCommerce
+- Website: https://pocketmidi.com
